@@ -5,6 +5,13 @@
 class QBTTC_Taxonomies {
 
 	/**
+	 * Will contain any terms that already exist and haven't been created
+	 *
+	 * @var string
+	 */
+	public static $existing_terms = array();
+
+	/**
 	 * Retrieve the available taxonomies.
 	 *
 	 * @access public
@@ -38,7 +45,11 @@ class QBTTC_Taxonomies {
 		$total = 0;
 		foreach ($hierarchy as $hierarchy_entry) {
 			$id = self::insert($taxonomy, $hierarchy_entry['title'], $parent);
-			$total++;
+			if ($id) {
+				$total++;
+			} else {
+				QBTTC_Taxonomies::$existing_terms[] = $hierarchy_entry['title'];
+			}
 
 			if ( !empty($hierarchy_entry['children']) ) {
 				$total += self::process_hierarchy($hierarchy_entry['children'], $taxonomy, $id);
@@ -67,6 +78,11 @@ class QBTTC_Taxonomies {
 				'parent' => $parent
 			)
 		);
+
+		// handling existing terms
+		if (is_wp_error($term)) {
+			return false;
+		}
 
 		return $term['term_id'];
 	}

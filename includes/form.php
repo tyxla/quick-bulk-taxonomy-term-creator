@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Class for setting up the settings page with the main form.
@@ -202,7 +203,21 @@ class QBTTC_Form {
 
 		// add success notice
 		$notice = sprintf( _n('1 term inserted.', '%s terms inserted.', $total_terms, 'qbttc'), $total_terms );
-		add_settings_error('qbttc', 'settings_updated', $notice, 'updated');
+
+		// append existing terms to the notice
+		if (QBTTC_Taxonomies::$existing_terms) {
+			$total_existing_terms = count(QBTTC_Taxonomies::$existing_terms);
+			$notice .= '<br /><br />';
+			$notice .= sprintf( _n('The following term exists, so it was not created:', 'The following terms exist, so they were not created:', $total_existing_terms, 'qbttc'), $total_existing_terms );
+			$notice .= '<ul style="list-style-type: disc; font-style: italic; padding-left: 32px;">';
+			foreach (QBTTC_Taxonomies::$existing_terms as $title) {
+				$notice .= '<li>' . $title . '</li>';
+			}
+			$notice .= '</ul>';
+		}
+
+		// display notice
+		add_settings_error('qbttc', 'settings_updated', $notice, 'updated ');
 	}
 
 }
