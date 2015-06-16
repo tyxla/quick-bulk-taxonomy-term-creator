@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Class for setting up the settings page with the main form.
